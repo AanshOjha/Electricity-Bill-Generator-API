@@ -1,7 +1,5 @@
 package com.project.electricitybillgenerator.model;
 
-import java.util.Date;
-
 import jakarta.persistence.*;
 
 @Entity
@@ -10,12 +8,19 @@ public class BillReading {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-    private int meter_id;
+    @Column(name = "meter_id")
+    private int meterId;
     private double currentMonthReading;
     private double previousMonthReading;
     private String date;
     private double unitConsumed;
     private double billAmount;
+
+    @ManyToOne
+    @JoinColumn(name = "meter_id", referencedColumnName = "meter_id", insertable = false, updatable = false)
+    private BillUser billUser;
+
+    // getters and setters
 
     public String getDate() {
         return date;
@@ -24,12 +29,6 @@ public class BillReading {
     public void setDate(String date) {
         this.date = date;
     }
-
-    @ManyToOne
-    @JoinColumn(name = "meter_id", referencedColumnName = "meter_id", insertable = false, updatable = false)
-    private BillUser billUser;
-
-    // getters and setters
 
     /**
      * @return double return the currentMonthReading
@@ -93,15 +92,15 @@ public class BillReading {
     /**
      * @return int return the meter_id
      */
-    public int getMeter_id() {
-        return meter_id;
+    public int getMeterId() {
+        return meterId;
     }
 
     /**
      * @param meter_id the meter_id to set
      */
-    public void setMeter_id(int meter_id) {
-        this.meter_id = meter_id;
+    public void setMeterId(int meter_id) {
+        this.meterId = meter_id;
     }
 
     /**

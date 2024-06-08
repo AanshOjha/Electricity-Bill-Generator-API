@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.project.electricitybillgenerator.model.BillUser;
 import com.project.electricitybillgenerator.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService{
@@ -27,7 +28,7 @@ public class UserService{
 
     public BillUser saveUser(BillUser model) {
         int meter_id = rand.nextInt(8999) + 1000;
-        model.setMeter_id(meter_id);
+        model.setMeterId(meter_id);
         return userRepository.save(model);
     }
 
@@ -35,8 +36,18 @@ public class UserService{
         return (List<BillUser>) userRepository.findAll();
     }
 
-    public void deleteUser(int meter_id) {
-        userRepository.deleteById(meter_id);
+    @Transactional
+    public void deleteUserAndReadings(int meterId) {
+        userRepository.deleteBillReadingByMeterId(meterId);
+        userRepository.deleteUserByMeterId(meterId);
+    }
+
+    @Transactional
+    public void deleteAllUserAndReadings() {
+        userRepository.disableSafeUpdates();
+        userRepository.deleteAllUsers();
+        userRepository.deleteAllReadings();
+        userRepository.enableSafeUpdates();
     }
 
     public void deleteAllUsers() {

@@ -42,4 +42,14 @@ public class ReadingService {
             return 0;
         }
     }
+
+    public double unitRate = 7.5;
+    public double gstRate = 18;
+
+    public double calculateBill(double currentMonthReading, double previousMonthReading) {
+        var bill = (currentMonthReading - previousMonthReading) * unitRate;
+        var gst = (gstRate/100.0) * bill;
+        var totalBill = bill + gst;
+        return totalBill;
+    }
 }

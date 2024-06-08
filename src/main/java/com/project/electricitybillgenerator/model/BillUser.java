@@ -1,5 +1,6 @@
 package com.project.electricitybillgenerator.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -8,18 +9,19 @@ import jakarta.persistence.Table;
 @Table(name = "user")
 public class BillUser {
     @Id
-    private int meter_id;
+    @Column(name = "meter_id")
+    private int meterId;
     private String name;
     private String address;
     private String password;
     private String email;
 
-    public int getMeter_id() {
-        return meter_id;
+    public int getMeterId() {
+        return meterId;
     }
 
-    public void setMeter_id(int meter_id) {
-        this.meter_id = meter_id;
+    public void setMeterId(int meter_id) {
+        this.meterId = meter_id;
     }
 
     public String getName() {

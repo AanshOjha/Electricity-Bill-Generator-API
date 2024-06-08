@@ -1,11 +1,13 @@
 package com.project.electricitybillgenerator.controller;
 
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
+import com.project.electricitybillgenerator.repository.ReadingRepository;
 import com.project.electricitybillgenerator.repository.UserRepository;
+import com.project.electricitybillgenerator.service.BillPDFGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +25,9 @@ public class BillController {
     @Autowired
     ReadingService readingService;
     @Autowired
-    private UserRepository userRepository;
+    UserRepository userRepository;
+    @Autowired
+    ReadingRepository readingRepository;
 
     // User registration and operations
     @PostMapping("/register")
@@ -36,14 +40,15 @@ public class BillController {
         return userService.getAllUsers();
     }
 
-    @PostMapping("/deleteuser")
-    public void deleteUser(@RequestParam int meter_id) {
-        userService.deleteUser(meter_id);
+    @DeleteMapping("/deleteuser")
+    public ResponseEntity<String> deleteUser(@RequestParam int meter_id) {
+        userService.deleteUserAndReadings(meter_id);
+        return ResponseEntity.ok("Successfully deleted user with ID: " + meter_id);
     }
 
     @DeleteMapping("/deleteall")
     public ResponseEntity<String> deleteAllUsers() {
-        userService.deleteAllUsers();
+        userService.deleteAllUserAndReadings();
         return ResponseEntity.ok("Deleted all users!");
     }
 
@@ -52,12 +57,21 @@ public class BillController {
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         // Get meter_id & currentMonthReading from user
-        reading.setPreviousMonthReading(readingService.previousMonthReading(reading.getMeter_id(), date));
-        reading.setDate(sdf.format(date).toString());
+        reading.setPreviousMonthReading(readingService.previousMonthReading(reading.getMeterId(), date));
+        reading.setDate(sdf.format(date));
 
         // Calculate units consumed and bill
-        reading.setUnitConsumed(reading.getCurrentMonthReading() - reading.getPreviousMonthReading());
-        reading.setBillAmount(reading.getUnitConsumed()*7.5);
+        var currentReading = reading.getCurrentMonthReading();
+        var previousReading = reading.getPreviousMonthReading();
+        reading.setUnitConsumed(currentReading - previousReading);
+        reading.setBillAmount(readingService.calculateBill(currentReading, previousReading));
         return userService.insertReading(reading);
+    }
+
+    @GetMapping("/pdf")
+    public ResponseEntity<String> generatePDF(@RequestBody BillReading reading) throws FileNotFoundException {
+        BillPDFGenerator pdf = new BillPDFGenerator(userRepository, readingRepository);
+        pdf.statement(reading);
+        return ResponseEntity.ok(pdf.statement(reading));
     }
 }
