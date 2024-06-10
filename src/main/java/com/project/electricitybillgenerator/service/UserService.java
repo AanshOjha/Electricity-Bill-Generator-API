@@ -45,8 +45,8 @@ public class UserService{
     @Transactional
     public void deleteAllUserAndReadings() {
         userRepository.disableSafeUpdates();
-        userRepository.deleteAllUsers();
         userRepository.deleteAllReadings();
+        userRepository.deleteAllUsers();
         userRepository.enableSafeUpdates();
     }
 

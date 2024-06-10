@@ -2,10 +2,10 @@
 
 ```json
 {
-"name":"Aansh",
-"address": "Address, India",
-"password": "password",
-"email": "example@test.com"
+    "name":"Aansh",
+    "address": "Address, India",
+    "password": "password",
+    "email": "example@test.com"
 }
 ```
 
