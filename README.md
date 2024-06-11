@@ -1,3 +1,13 @@
+# Electricity Bill Generator
+This is a Spring Boot Rest API.
+
+## Features:
+* Registers user and give them a unique meter ID.
+* User can insert their current month resdings.
+* User can generate Electricity bill PDF for the month specified, by entering meter ID and date.
+* User can delete their account also by specifying their meter ID in the link. Eg. 'localhost:8080/bill/deleteuser?meter_id=4554`.
+
+## API Endpoints used:
 ### **POST**: `localhost:8080/bill/register`
 
 ```json
@@ -21,6 +31,10 @@
 {
     "meterId" : 5953,
     "currentMonthReading": 666.89
+
+https://github.com/AanshOjha/Electricity-Bill-Generator-API/assets/108977462/1dd25780-c85b-4232-bb7e-29292fecfdc3
+
+
 }
 ```
 
@@ -33,4 +47,4 @@
 }
 ```
 
-
+## [Demo Video](https://1drv.ms/v/s!Agwf35R6wYp7ga0rhSOTE-_xGrWY_w?e=Rs9PNz)
