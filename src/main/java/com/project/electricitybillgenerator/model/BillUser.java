@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 @Table(name = "user")
 public class BillUser {
     @Id
-    @Column(name = "meter_id")
+    @Column(name = "meterId")
     private int meterId;
     private String name;
     private String address;
@@ -20,8 +20,8 @@ public class BillUser {
         return meterId;
     }
 
-    public void setMeterId(int meter_id) {
-        this.meterId = meter_id;
+    public void setMeterId(int meterId) {
+        this.meterId = meterId;
     }
 
     public String getName() {

@@ -33,11 +33,11 @@ public class BillPDFGenerator {
 
     public String statement(BillReading allReading) throws FileNotFoundException {
         ReadingService constants = new ReadingService(readingRepository);
-        int meter_id = allReading.getMeterId();
+        int meterId = allReading.getMeterId();
         String date = allReading.getDate();
-        Optional<BillUser> user = userRepository.findByMeterId(meter_id);
-        Optional<BillReading> userData = readingRepository.findByMeterId(meter_id, date);
-        System.out.println(meter_id);
+        Optional<BillUser> user = userRepository.findByMeterId(meterId);
+        Optional<BillReading> userData = readingRepository.findByMeterId(meterId, date);
+        System.out.println(meterId);
 
         String name;
         double currentReading;
@@ -64,7 +64,7 @@ public class BillPDFGenerator {
             email = user.get().getEmail();
 
             // Rest of your code...
-            String path = String.format("C:\\Users\\itsaa\\Downloads\\%d-bill-%s.pdf", meter_id, date);
+            String path = String.format("C:\\Users\\itsaa\\Downloads\\%d-bill-%s.pdf", meterId, date);
             PdfWriter pdfWriter = new PdfWriter(path);
             PdfDocument pdfdoc = new PdfDocument(pdfWriter);
             pdfdoc.setDefaultPageSize(PageSize.A4);
@@ -83,7 +83,7 @@ public class BillPDFGenerator {
             String p1 = String.format("""
                         Bill number: %s
                         Date: %s
-                        """, date + meter_id,
+                        """, date + meterId,
                     LocalDate.now(ZoneId.of("Asia/Kolkata")));
 
             String p2 = String.format("""
@@ -91,7 +91,7 @@ public class BillPDFGenerator {
                 Address: %s
                 Email: %s
                 Meter ID: %d
-                """, name, address, email, meter_id);
+                """, name, address, email, meterId);
 
             String p3 = String.format("""
                         Bill for month: %s

@@ -1,3 +1,5 @@
+
+
 ### **POST**: `localhost:8080/bill/register`
 
 ```json
@@ -11,7 +13,7 @@
 
 ### **GET**: `localhost:8080/bill/getallusers`
 
-### **DELETE**: `localhost:8080/bill/deleteuser?meter_id=4554`
+### **DELETE**: `localhost:8080/bill/deleteuser?meterId=4554`
 
 ### **DELETE**: `localhost:8080/bill/deleteall`
 

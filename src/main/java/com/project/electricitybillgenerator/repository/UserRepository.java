@@ -12,11 +12,11 @@ public interface UserRepository extends CrudRepository<BillUser, Integer> {
     Optional<BillUser> findByMeterId(int meterId);
 
     @Modifying
-    @Query(value = "delete from billreading where meter_id=?1", nativeQuery = true)
+    @Query(value = "delete from billreading where meterId=?1", nativeQuery = true)
     public void deleteBillReadingByMeterId(int meterId);
 
     @Modifying
-    @Query(value = "delete from user where meter_id=?1", nativeQuery = true)
+    @Query(value = "delete from user where meterId=?1", nativeQuery = true)
     public void deleteUserByMeterId(int meterId);
 
     @Modifying
