@@ -31,10 +31,6 @@ This is a Spring Boot Rest API.
 {
     "meterId" : 5953,
     "currentMonthReading": 666.89
-
-https://github.com/AanshOjha/Electricity-Bill-Generator-API/assets/108977462/1dd25780-c85b-4232-bb7e-29292fecfdc3
-
-
 }
 ```
 
