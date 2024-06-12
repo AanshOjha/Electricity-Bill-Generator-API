@@ -38,7 +38,6 @@ public class ReadingService {
             return previousReading.getFirst();
         } else {
             // Handle the case when the list is empty
-            // For example, return a default value or throw a custom exception
             return 0;
         }
     }
