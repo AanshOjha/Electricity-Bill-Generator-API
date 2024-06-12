@@ -44,7 +44,7 @@ public class BillReading {
         this.currentMonthReading = currentMonthReading;
     }
 
-    
+
 
     /**
      * @return double return the unitConsumed

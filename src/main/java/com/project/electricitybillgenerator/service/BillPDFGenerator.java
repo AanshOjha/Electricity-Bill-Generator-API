@@ -101,8 +101,8 @@ public class BillPDFGenerator {
                         Unit Price: %.2f
                         Bill: %.2f
                         18%% GST: %.2f
-                        """,
-                    date, currentReading, previousReading, unitsConsumed, unitRate,
+                        """, date,
+                    currentReading, previousReading, unitsConsumed, unitsConsumed,
                     billWithoutGST, gst);
 
             String p4 = String.format("Payable Amount: %.2f",
