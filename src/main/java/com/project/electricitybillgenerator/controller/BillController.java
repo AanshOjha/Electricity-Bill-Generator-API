@@ -41,9 +41,9 @@ public class BillController {
     }
 
     @DeleteMapping("/deleteuser")
-    public ResponseEntity<String> deleteUser(@RequestParam int meter_id) {
-        userService.deleteUserAndReadings(meter_id);
-        return ResponseEntity.ok("Successfully deleted user with ID: " + meter_id);
+    public ResponseEntity<String> deleteUser(@RequestParam int meterId) {
+        userService.deleteUserAndReadings(meterId);
+        return ResponseEntity.ok("Successfully deleted user with ID: " + meterId);
     }
 
     @DeleteMapping("/deleteall")
@@ -56,7 +56,7 @@ public class BillController {
     public BillReading insertReading(@RequestBody BillReading reading) {
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        // Get meter_id & currentMonthReading from user
+        // Get meterId & currentMonthReading from user
         reading.setPreviousMonthReading(readingService.previousMonthReading(reading.getMeterId(), date));
         reading.setDate(sdf.format(date));
 

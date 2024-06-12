@@ -90,17 +90,17 @@ public class BillReading {
 
 
     /**
-     * @return int return the meter_id
+     * @return int return the meterId
      */
     public int getMeterId() {
         return meterId;
     }
 
     /**
-     * @param meter_id the meter_id to set
+     * @param meterId the meterId to set
      */
-    public void setMeterId(int meter_id) {
-        this.meterId = meter_id;
+    public void setMeterId(int meterId) {
+        this.meterId = meterId;
     }
 
     /**

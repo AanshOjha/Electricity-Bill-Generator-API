@@ -20,8 +20,8 @@ public class BillUser {
         return meterId;
     }
 
-    public void setMeterId(int meter_id) {
-        this.meterId = meter_id;
+    public void setMeterId(int meterId) {
+        this.meterId = meterId;
     }
 
     public String getName() {

@@ -32,8 +32,8 @@ public class ReadingService {
     }
 
     // SQL query to get the previous month reading from previousDate
-    public double previousMonthReading(int meter_id, Date date) {
-        var previousReading = readingRepository.previousReading(meter_id, previousDate(date));
+    public double previousMonthReading(int meterId, Date date) {
+        var previousReading = readingRepository.previousReading(meterId, previousDate(date));
         if (!previousReading.isEmpty()) {
             return previousReading.getFirst();
         } else {

@@ -27,8 +27,8 @@ public class UserService{
     Random rand = new Random();
 
     public BillUser saveUser(BillUser model) {
-        int meter_id = rand.nextInt(8999) + 1000;
-        model.setMeterId(meter_id);
+        int meterId = rand.nextInt(8999) + 1000;
+        model.setMeterId(meterId);
         return userRepository.save(model);
     }
 
