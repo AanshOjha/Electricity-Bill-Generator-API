@@ -2,6 +2,7 @@
 This is a Spring Boot Rest API which uses MySQL.
 
 ## [Demo Video](https://1drv.ms/v/s!Agwf35R6wYp7ga0rhSOTE-_xGrWY_w?e=Rs9PNz)
+<h2><a href="https://1drv.ms/v/s!Agwf35R6wYp7ga0rhSOTE-_xGrWY_w?e=Rs9PNz" target="_blank">Demo</a></h2>
 
 ## Features:
 * Registers user and give them a unique meter ID.
