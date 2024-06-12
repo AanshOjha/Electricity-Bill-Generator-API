@@ -3,7 +3,7 @@ This is a Spring Boot Rest API.
 
 ## Features:
 * Registers user and give them a unique meter ID.
-* User can insert their current month resdings.
+* User can insert their current month readings.
 * User can generate Electricity bill PDF for the month specified, by entering meter ID and date.
 * User can delete their account also by specifying their meter ID in the link. Eg. 'localhost:8080/bill/deleteuser?meter_id=4554`.
 
