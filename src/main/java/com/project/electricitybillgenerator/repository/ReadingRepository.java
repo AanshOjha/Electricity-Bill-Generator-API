@@ -8,12 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import com.project.electricitybillgenerator.model.BillReading;
-import org.springframework.stereotype.Repository;
 
 public interface ReadingRepository extends CrudRepository<BillReading, Integer> {
-    @Query(value = "SELECT current_month_reading FROM billreading where meterId=?1", nativeQuery = true)
-    public List<Double> previousReading(int meterId, Date previousDate);
+    void deleteByMeterId(int meterId);
 
-    @Query(value = "SELECT * FROM billreading WHERE meterId=?1 AND date=?2", nativeQuery = true)
-    public Optional<BillReading> findByMeterId(int meterId, String date);
+    Optional<BillReading> findByMeterIdAndDate(int meterId, String date);
+
+    @Query(value = "SELECT current_month_reading FROM billreading where meter_id=?1", nativeQuery = true)
+    public List<Double> previousReading(int meterId, Date previousDate);
 }

@@ -36,7 +36,10 @@ public class BillPDFGenerator {
         int meterId = allReading.getMeterId();
         String date = allReading.getDate();
         Optional<BillUser> user = userRepository.findByMeterId(meterId);
-        Optional<BillReading> userData = readingRepository.findByMeterId(meterId, date);
+        System.out.println("PDF Generator:\nMeter id: " + meterId);
+        System.out.println("Date: " + date);
+        Optional<BillReading> userData = readingRepository.findByMeterIdAndDate(meterId, date);
+        System.out.println("From db: " + userData);
         System.out.println(meterId);
 
         String name;

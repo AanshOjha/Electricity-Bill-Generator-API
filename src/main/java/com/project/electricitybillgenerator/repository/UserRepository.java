@@ -6,34 +6,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends CrudRepository<BillUser, Integer> {
     Optional<BillUser> findByMeterId(int meterId);
 
-    @Modifying
-    @Query(value = "delete from billreading where meterId=?1", nativeQuery = true)
-    public void deleteBillReadingByMeterId(int meterId);
+    Optional<BillUser> findByMeterIdAndPassword(int meterId, String password);
 
-    @Modifying
-    @Query(value = "delete from user where meterId=?1", nativeQuery = true)
-    public void deleteUserByMeterId(int meterId);
-
-    @Modifying
-    @Query(value = "SET SQL_SAFE_UPDATES = 0", nativeQuery = true)
-    public void disableSafeUpdates();
-
-    @Modifying
-    @Query(value = "delete from user;", nativeQuery = true)
-    public void deleteAllUsers();
-
-    @Modifying
-    @Query(value = "delete from billreading;", nativeQuery = true)
-    public void deleteAllReadings();
-
-    @Modifying
-    @Query(value = "SET SQL_SAFE_UPDATES = 1", nativeQuery = true)
-    public void enableSafeUpdates();
-
-
+    void deleteByMeterId(int meterId);
 }

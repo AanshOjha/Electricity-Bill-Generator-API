@@ -26,6 +26,11 @@ public class UserService{
 
     Random rand = new Random();
 
+    public boolean checkCredentials(int meterId, String password) {
+        var user = userRepository.findByMeterIdAndPassword(meterId, password);
+        return user.isPresent();
+    }
+
     public BillUser saveUser(BillUser model) {
         int meterId = rand.nextInt(8999) + 1000;
         model.setMeterId(meterId);
@@ -38,16 +43,14 @@ public class UserService{
 
     @Transactional
     public void deleteUserAndReadings(int meterId) {
-        userRepository.deleteBillReadingByMeterId(meterId);
-        userRepository.deleteUserByMeterId(meterId);
+        readingRepository.deleteByMeterId(meterId);
+        userRepository.deleteByMeterId(meterId);
     }
 
     @Transactional
     public void deleteAllUserAndReadings() {
-        userRepository.disableSafeUpdates();
-        userRepository.deleteAllReadings();
-        userRepository.deleteAllUsers();
-        userRepository.enableSafeUpdates();
+        readingRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     public void deleteAllUsers() {
