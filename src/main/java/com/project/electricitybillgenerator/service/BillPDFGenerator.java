@@ -37,7 +37,7 @@ public class BillPDFGenerator {
         int meterId = reading.getMeterId();
         String date = reading.getDate();
         Optional<BillUser> user = userRepository.findByMeterId(meterId);
-        Optional<BillReading> userData = readingRepository.findByMeterIdAndDate(meterId, date);
+        Optional<BillReading> userData = readingRepository.findByMeterIdAndDateTest(meterId, date);
 
         String name, address, email;
         double currentReading, previousReading, unitsConsumed, unitRate, billAmount, gst, billWithoutGST;

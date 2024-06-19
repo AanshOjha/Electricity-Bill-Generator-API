@@ -21,8 +21,9 @@
 
 ```json
 {
-    "meterId" : 5953,
-    "currentMonthReading": 666.89
+  "password": "12345",
+  "meterId" : 2956,
+  "currentMonthReading": 143.89
 }
 ```
 
@@ -30,8 +31,9 @@
 
 ```json
 {
-    "date": "2024-06-08",
-    "meterId": 5953
+  "date": "2024-06",
+  "meterId": 2956,
+  "password": "12345"
 }
 ```
 

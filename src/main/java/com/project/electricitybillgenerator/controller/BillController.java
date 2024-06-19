@@ -67,7 +67,7 @@ public class BillController {
         reading.setPreviousMonthReading(readingService.previousMonthReading(reading.getMeterId(), date));
 
         // Check if this month reading already exists
-        var optionalReading = readingRepository.findByMeterIdAndDate(
+        var optionalReading = readingRepository.findByMeterIdAndDateTest(
                 reading.getMeterId(), reading.getDate());
 
         if (optionalReading.isPresent()) {
@@ -98,6 +98,8 @@ public class BillController {
         billUser.setPassword(data.getPassword());
         billUser.setMeterId(data.getMeterId());
         reading.setMeterId(data.getMeterId());
+
+        // Date in form of yyyy-MM
         reading.setDate(data.getDate());
 
         // Check if meter id and password is correct

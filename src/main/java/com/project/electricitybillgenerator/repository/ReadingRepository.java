@@ -12,7 +12,8 @@ import com.project.electricitybillgenerator.model.BillReading;
 public interface ReadingRepository extends CrudRepository<BillReading, Integer> {
     void deleteByMeterId(int meterId);
 
-    Optional<BillReading> findByMeterIdAndDate(int meterId, String date);
+    @Query(value = "SELECT * FROM billreading WHERE meter_id=?1 AND date LIKE ?2%", nativeQuery = true)
+    Optional<BillReading> findByMeterIdAndDateTest(int meterId, String date);
 
     @Query(value = "SELECT current_month_reading FROM billreading where meter_id=?1", nativeQuery = true)
     public List<Double> previousReading(int meterId, Date previousDate);
