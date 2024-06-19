@@ -14,6 +14,7 @@ import com.project.electricitybillgenerator.model.BillReading;
 import com.project.electricitybillgenerator.model.BillUser;
 import com.project.electricitybillgenerator.repository.ReadingRepository;
 import com.project.electricitybillgenerator.repository.UserRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
@@ -23,37 +24,26 @@ import java.util.Optional;
 
 @Service
 public class BillPDFGenerator {
-    private final  UserRepository userRepository;
-    private final  ReadingRepository readingRepository;
+    private final UserRepository userRepository;
+    private final ReadingRepository readingRepository;
 
     public BillPDFGenerator(UserRepository userRepository, ReadingRepository readingRepository) {
         this.userRepository = userRepository;
         this.readingRepository = readingRepository;
     }
 
-    public String statement(BillReading allReading) throws FileNotFoundException {
+    public ResponseEntity<String> generatePDF(BillReading reading) throws FileNotFoundException {
         ReadingService constants = new ReadingService(readingRepository);
-        int meterId = allReading.getMeterId();
-        String date = allReading.getDate();
+        int meterId = reading.getMeterId();
+        String date = reading.getDate();
         Optional<BillUser> user = userRepository.findByMeterId(meterId);
-        System.out.println("PDF Generator:\nMeter id: " + meterId);
-        System.out.println("Date: " + date);
         Optional<BillReading> userData = readingRepository.findByMeterIdAndDate(meterId, date);
-        System.out.println("From db: " + userData);
-        System.out.println(meterId);
 
-        String name;
-        double currentReading;
-        double previousReading;
-        double unitsConsumed;
-        double unitRate;
-        double billAmount;
-        double gst;
-        double billWithoutGST;
-        String address;
-        String email;
+        String name, address, email;
+        double currentReading, previousReading, unitsConsumed, unitRate, billAmount, gst, billWithoutGST;
 
         if (user.isPresent() && userData.isPresent()) {
+            // Assigning values to them
             currentReading = userData.get().getCurrentMonthReading();
             previousReading = userData.get().getPreviousMonthReading();
             unitsConsumed = userData.get().getUnitConsumed();
@@ -66,7 +56,7 @@ public class BillPDFGenerator {
             address = user.get().getAddress();
             email = user.get().getEmail();
 
-            // Rest of your code...
+            // Generating PDF
             String path = String.format("C:\\Users\\itsaa\\Downloads\\%d-bill-%s.pdf", meterId, date);
             PdfWriter pdfWriter = new PdfWriter(path);
             PdfDocument pdfdoc = new PdfDocument(pdfWriter);
@@ -119,10 +109,10 @@ public class BillPDFGenerator {
             document.add(divider1);
             document.add(new Paragraph(p4));
             document.close();
-            return "Saved successfully to " + path;
+            return ResponseEntity.ok("Saved successfully to " + path);
         } else {
-            // Handle the case where the user or userData isn't present...
-            return "Sorry";
+            // When the user or userData isn't present...
+            return ResponseEntity.status(404).body("Sorry, no data found for the entered information.");
         }
     }
 }

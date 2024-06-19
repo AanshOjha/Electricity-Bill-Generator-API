@@ -6,6 +6,7 @@ import java.util.Random;
 import com.project.electricitybillgenerator.model.BillReading;
 import com.project.electricitybillgenerator.repository.ReadingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.project.electricitybillgenerator.model.BillUser;
@@ -42,19 +43,17 @@ public class UserService{
     }
 
     @Transactional
-    public void deleteUserAndReadings(int meterId) {
+    public ResponseEntity<String> deleteUserAndReadings(int meterId) {
         readingRepository.deleteByMeterId(meterId);
         userRepository.deleteByMeterId(meterId);
+        return ResponseEntity.ok("Successfully deleted user with ID: " + meterId);
     }
 
     @Transactional
-    public void deleteAllUserAndReadings() {
+    public ResponseEntity<String> deleteAllUserAndReadings() {
         readingRepository.deleteAll();
         userRepository.deleteAll();
-    }
-
-    public void deleteAllUsers() {
-        userRepository.deleteAll();
+        return ResponseEntity.ok("Deleted all users!");
     }
 
     public BillReading insertReading(BillReading billReading) {

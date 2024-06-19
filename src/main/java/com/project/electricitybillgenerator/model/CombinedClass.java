@@ -1,8 +1,6 @@
 package com.project.electricitybillgenerator.model;
 
-import jakarta.persistence.Entity;
-
-
+// For entering both BillUser and BillReading variables in one json object
 public class CombinedClass {
     private int meterId;
     private double currentMonthReading;

@@ -19,32 +19,30 @@ public class ReadingService {
         this.readingRepository = readingRepository;
     }
 
+    // Rates of Unit and GST
+    public double unitRate = 7.5;
+    public double gstRate = 18;
+
+    // Get previous month i.e., current month - 1
     public Date previousDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(MONTH, -1);
         Date previousDate = cal.getTime();
-        System.out.println(sdf.format(date));
-        System.out.println(sdf.format(previousDate));
-
         return previousDate;
     }
 
-    // SQL query to get the previous month reading from previousDate
+    // Get the previous month reading from previousDate
     public double previousMonthReading(int meterId, Date date) {
         var previousReading = readingRepository.previousReading(meterId, previousDate(date));
         if (!previousReading.isEmpty()) {
             return previousReading.getFirst();
         } else {
-            // Handle the case when the list is empty
-            // For example, return a default value or throw a custom exception
+            // When the list is empty
             return 0;
         }
     }
-
-    public double unitRate = 7.5;
-    public double gstRate = 18;
 
     public double calculateBill(double currentMonthReading, double previousMonthReading) {
         var bill = (currentMonthReading - previousMonthReading) * unitRate;

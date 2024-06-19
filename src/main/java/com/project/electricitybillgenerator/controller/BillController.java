@@ -53,11 +53,11 @@ public class BillController {
         var userExistsWithCreds = userService.checkCredentials(billUser.getMeterId(), billUser.getPassword());
 
         // If user not exists
-        if (userExistsWithCreds==false) {
+        if (!userExistsWithCreds) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Credentials. Try again!");
         }
 
-        // User exists, continue inserting readings
+        // User exists, continue inserting readings ==================
         // Assigning current date to date of BillReading
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -66,13 +66,12 @@ public class BillController {
         // Get and Set previousMonthReading using meter_id and date
         reading.setPreviousMonthReading(readingService.previousMonthReading(reading.getMeterId(), date));
 
-        // Check if this month reading exists
+        // Check if this month reading already exists
         var optionalReading = readingRepository.findByMeterIdAndDate(
                 reading.getMeterId(), reading.getDate());
 
         if (optionalReading.isPresent()) {
             String dateFromDB = optionalReading.get().getDate();
-            System.out.println("Dates: " + reading.getDate() + " and " + dateFromDB);
             if (Objects.equals(reading.getDate(), dateFromDB)) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("This month reading already exists. Try again!");
             }
@@ -94,19 +93,20 @@ public class BillController {
         BillPDFGenerator pdf = new BillPDFGenerator(userRepository, readingRepository);
         BillReading reading = new BillReading();
         BillUser billUser = new BillUser();
+
+        // Assign values to billuser and reading from entered data
         billUser.setPassword(data.getPassword());
         billUser.setMeterId(data.getMeterId());
-        System.out.println("Meter id obtained: "+data.getMeterId());
-        System.out.println("Date obtained: "+data.getDate());
         reading.setMeterId(data.getMeterId());
         reading.setDate(data.getDate());
 
-        var checkCreds = userService.checkCredentials(billUser.getMeterId(), billUser.getPassword());
+        // Check if meter id and password is correct
+        boolean checkCreds = userService.checkCredentials(billUser.getMeterId(), billUser.getPassword());
 
-        if (checkCreds==false) {
+        if (!checkCreds) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Credentials. Try again!");
         }
-        return ResponseEntity.ok(pdf.statement(reading));
+        return pdf.generatePDF(reading);
     }
 
     @GetMapping("/getallusers")
@@ -116,13 +116,11 @@ public class BillController {
 
     @DeleteMapping("/deleteuser")
     public ResponseEntity<String> deleteUser(@RequestParam int meterId) {
-        userService.deleteUserAndReadings(meterId);
-        return ResponseEntity.ok("Successfully deleted user with ID: " + meterId);
+        return userService.deleteUserAndReadings(meterId);
     }
 
     @DeleteMapping("/deleteall")
     public ResponseEntity<String> deleteAllUsers() {
-        userService.deleteAllUserAndReadings();
-        return ResponseEntity.ok("Deleted all users!");
+        return userService.deleteAllUserAndReadings();
     }
 }

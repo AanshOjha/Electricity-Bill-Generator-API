@@ -8,7 +8,7 @@ public class BillReading {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-    @Column(name = "meterId")
+    @Column(name = "meter_id")
     private int meterId;
     private double currentMonthReading;
     private double previousMonthReading;
@@ -17,7 +17,7 @@ public class BillReading {
     private double billAmount;
 
     @ManyToOne
-    @JoinColumn(name = "meterId", referencedColumnName = "meterId", insertable = false, updatable = false)
+    @JoinColumn(name = "meter_id", referencedColumnName = "meter_id", insertable = false, updatable = false)
     private BillUser billUser;
 
     // getters and setters
