@@ -5,11 +5,10 @@ import java.util.Calendar;
 import static java.util.Calendar.MONTH;
 import java.util.Date;
 
-import com.project.electricitybillgenerator.model.BillReading;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.project.electricitybillgenerator.repository.ReadingRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ReadingService {
@@ -49,5 +48,11 @@ public class ReadingService {
         var gst = (gstRate/100.0) * bill;
         var totalBill = bill + gst;
         return totalBill;
+    }
+
+    @Transactional // because error: Executing an update/delete query
+    public ResponseEntity<String> deleteReadingWithDate(int meterId, String date) {
+        readingRepository.deleteReadingByMeterIdAndDate(meterId, date);
+        return ResponseEntity.ok("Deleted reading of " + date + "!");
     }
 }

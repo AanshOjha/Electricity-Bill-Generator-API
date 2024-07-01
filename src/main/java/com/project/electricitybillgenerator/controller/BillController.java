@@ -38,6 +38,7 @@ public class BillController {
         return userService.saveUser(user);
     }
 
+    // Insert Reading
     @PostMapping("/insertreading")
     public ResponseEntity<String> insertReading(@RequestBody CombinedClass data) {
         BillUser billUser = new BillUser();
@@ -114,6 +115,29 @@ public class BillController {
     @GetMapping("/getallusers")
     public List<BillUser> getAllUsers() {
         return userService.getAllUsers();
+    }
+
+    // meterId, password and date
+    @DeleteMapping("/deletereading")
+    public ResponseEntity<String> deleteReading(@RequestBody CombinedClass data) {
+        BillReading reading = new BillReading();
+        BillUser billUser = new BillUser();
+
+        // Assign values to billuser and reading from entered data
+        billUser.setPassword(data.getPassword());
+        billUser.setMeterId(data.getMeterId());
+        reading.setMeterId(data.getMeterId());
+
+        // Date in form of yyyy-MM
+        reading.setDate(data.getDate());
+
+        // Check if meter id and password is correct
+        boolean checkCreds = userService.checkCredentials(billUser.getMeterId(), billUser.getPassword());
+
+        if (!checkCreds) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Credentials. Try again!");
+        }
+        return readingService.deleteReadingWithDate(reading.getMeterId(), reading.getDate());
     }
 
     @DeleteMapping("/deleteuser")

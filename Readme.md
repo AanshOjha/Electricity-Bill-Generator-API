@@ -37,4 +37,14 @@
 }
 ```
 
+### **DELETE**: `localhost:8080/bill/deletereading`
+
+```json
+{
+    "meterId": 3952,
+    "password": "12345",
+    "date": "2024-07"
+}
+```
+
 
