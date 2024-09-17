@@ -36,7 +36,7 @@ public class ReadingService {
     public double previousMonthReading(int meterId, Date date) {
         var previousReading = readingRepository.previousReading(meterId, previousDate(date));
         if (!previousReading.isEmpty()) {
-            return previousReading.getFirst();
+            return previousReading.getLast();
         } else {
             // When the list is empty
             return 0;

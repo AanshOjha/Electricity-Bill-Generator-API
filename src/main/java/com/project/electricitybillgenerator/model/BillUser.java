@@ -16,6 +16,13 @@ public class BillUser {
     private String password;
     private String email;
 
+    public BillUser(String name, String address, String number, String email) {
+    }
+
+    public BillUser() {
+
+    }
+
     public int getMeterId() {
         return meterId;
     }
