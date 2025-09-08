@@ -1,45 +1,92 @@
 package com.project.electricitybillgenerator.service;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import static java.util.Calendar.MONTH;
-import java.util.Date;
-
-import com.project.electricitybillgenerator.model.BillReading;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.project.electricitybillgenerator.repository.ReadingRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Service class for handling electricity meter reading operations.
+ * 
+ * @author Electricity Bill Generator Team
+ * @version 1.0
+ */
 @Service
 public class ReadingService {
+    
+    private static final Logger logger = LoggerFactory.getLogger(ReadingService.class);
+    private static final double DEFAULT_READING = 0.0;
+    
     private final ReadingRepository readingRepository;
 
+    /**
+     * Constructor for ReadingService.
+     * 
+     * @param readingRepository the repository for reading data operations
+     */
     public ReadingService(ReadingRepository readingRepository) {
         this.readingRepository = readingRepository;
     }
 
-    public Date previousDate(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        cal.add(MONTH, -1);
-        Date previousDate = cal.getTime();
-        System.out.println(sdf.format(date));
-        System.out.println(sdf.format(previousDate));
-
-        return previousDate;
+    /**
+     * Calculates the date one month prior to the given date.
+     * 
+     * @param date the reference date
+     * @return the date one month prior
+     * @throws IllegalArgumentException if date is null
+     */
+    public Date getPreviousMonthDate(Date date) {
+        if (date == null) {
+            throw new IllegalArgumentException("Date cannot be null");
+        }
+        
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate previousMonth = localDate.minusMonths(1);
+        
+        logger.debug("Original date: {}, Previous month date: {}", 
+                    localDate, previousMonth);
+        
+        return Date.from(previousMonth.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
-    // SQL query to get the previous month reading from previousDate
-    public double previousMonthReading(int meter_id, Date date) {
-        var previousReading = readingRepository.previousReading(meter_id, previousDate(date));
-        if (!previousReading.isEmpty()) {
-            return previousReading.getFirst();
-        } else {
-            // Handle the case when the list is empty
-            // For example, return a default value or throw a custom exception
-            return 0;
+    /**
+     * Retrieves the previous month's reading for a specific meter.
+     * 
+     * @param meterId the meter identifier
+     * @param currentDate the current date for reference
+     * @return the previous month's reading, or default value if not found
+     * @throws IllegalArgumentException if meterId is invalid or currentDate is null
+     */
+    public double getPreviousMonthReading(Integer meterId, Date currentDate) {
+        if (meterId == null || meterId <= 0) {
+            throw new IllegalArgumentException("Meter ID must be positive");
+        }
+        if (currentDate == null) {
+            throw new IllegalArgumentException("Current date cannot be null");
+        }
+        
+        try {
+            Date previousDate = getPreviousMonthDate(currentDate);
+            List<Double> previousReadings = readingRepository.previousReading(meterId, previousDate);
+            
+            Optional<Double> reading = previousReadings.stream().findFirst();
+            
+            if (reading.isPresent()) {
+                logger.info("Found previous reading {} for meter {}", reading.get(), meterId);
+                return reading.get();
+            } else {
+                logger.warn("No previous reading found for meter {}, returning default value", meterId);
+                return DEFAULT_READING;
+            }
+        } catch (Exception e) {
+            logger.error("Error retrieving previous reading for meter {}: {}", meterId, e.getMessage());
+            return DEFAULT_READING;
         }
     }
 }
