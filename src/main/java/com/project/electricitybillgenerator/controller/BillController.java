@@ -11,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -163,7 +161,7 @@ public class BillController {
             logger.info("Attempting to insert reading for meter ID: {}", reading.getMeterId());
             
             // Process the reading with calculations
-            Date currentDate = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
+            LocalDate currentDate = LocalDate.now();
             BillReading processedReading = billCalculationService.processBillReading(reading, currentDate);
             
             // Save the processed reading

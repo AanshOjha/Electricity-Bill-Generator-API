@@ -60,6 +60,17 @@ public class BillReading {
         this.date = date;
     }
 
+    // Comprehensive constructor for processed readings
+    public BillReading(Integer meterId, Double currentMonthReading, Double previousMonthReading, 
+                      LocalDate date, Double unitConsumed, Double billAmount) {
+        this.meterId = meterId;
+        this.currentMonthReading = currentMonthReading;
+        this.previousMonthReading = previousMonthReading;
+        this.date = date;
+        this.unitConsumed = unitConsumed;
+        this.billAmount = billAmount;
+    }
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -123,26 +134,6 @@ public class BillReading {
 
     public void setBillUser(BillUser billUser) {
         this.billUser = billUser;
-    }
-
-    /**
-     * Calculates the unit consumed based on current and previous readings.
-     */
-    public void calculateUnitConsumed() {
-        if (currentMonthReading != null && previousMonthReading != null) {
-            this.unitConsumed = Math.max(0, currentMonthReading - previousMonthReading);
-        }
-    }
-
-    /**
-     * Calculates the bill amount based on unit consumed and rate per unit.
-     * 
-     * @param ratePerUnit the rate per unit of electricity
-     */
-    public void calculateBillAmount(double ratePerUnit) {
-        if (unitConsumed != null) {
-            this.billAmount = unitConsumed * ratePerUnit;
-        }
     }
 
     @Override

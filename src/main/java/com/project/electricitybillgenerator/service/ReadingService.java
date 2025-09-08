@@ -41,18 +41,17 @@ public class ReadingService {
      * @return the date one month prior
      * @throws IllegalArgumentException if date is null
      */
-    public Date getPreviousMonthDate(Date date) {
+    public LocalDate getPreviousMonthDate(LocalDate date) {
         if (date == null) {
             throw new IllegalArgumentException("Date cannot be null");
         }
         
-        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate previousMonth = localDate.minusMonths(1);
+        LocalDate previousMonth = date.minusMonths(1);
         
         logger.debug("Original date: {}, Previous month date: {}", 
-                    localDate, previousMonth);
+                    date, previousMonth);
         
-        return Date.from(previousMonth.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        return previousMonth;
     }
 
     /**
@@ -63,7 +62,7 @@ public class ReadingService {
      * @return the previous month's reading, or default value if not found
      * @throws IllegalArgumentException if meterId is invalid or currentDate is null
      */
-    public double getPreviousMonthReading(Integer meterId, Date currentDate) {
+    public double getPreviousMonthReading(Integer meterId, LocalDate currentDate) {
         if (meterId == null || meterId <= 0) {
             throw new IllegalArgumentException("Meter ID must be positive");
         }
@@ -72,8 +71,10 @@ public class ReadingService {
         }
         
         try {
-            Date previousDate = getPreviousMonthDate(currentDate);
-            List<Double> previousReadings = readingRepository.previousReading(meterId, previousDate);
+            LocalDate previousDate = getPreviousMonthDate(currentDate);
+            // Convert LocalDate to Date for repository compatibility
+            Date previousDateAsDate = Date.from(previousDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            List<Double> previousReadings = readingRepository.previousReading(meterId, previousDateAsDate);
             
             Optional<Double> reading = previousReadings.stream().findFirst();
             

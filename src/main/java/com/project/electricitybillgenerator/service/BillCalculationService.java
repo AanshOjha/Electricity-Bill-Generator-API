@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 /**
  * Service class for handling bill calculation operations.
@@ -36,41 +35,55 @@ public class BillCalculationService {
 
     /**
      * Processes a bill reading by calculating previous reading, units consumed, and bill amount.
+     * Creates a new BillReading object with calculated values instead of modifying the input.
      * 
-     * @param reading the reading to process
+     * @param inputReading the reading to process
      * @param currentDate the current date for reference
-     * @return the processed reading with calculated values
+     * @return a new processed reading with calculated values
      * @throws IllegalArgumentException if reading or date is invalid
      */
-    public BillReading processBillReading(BillReading reading, Date currentDate) {
-        if (reading == null) {
+    public BillReading processBillReading(BillReading inputReading, LocalDate currentDate) {
+        if (inputReading == null) {
             throw new IllegalArgumentException("Reading cannot be null");
         }
         if (currentDate == null) {
             throw new IllegalArgumentException("Current date cannot be null");
         }
-        
-        logger.info("Processing bill reading for meter ID: {}", reading.getMeterId());
-        
-        // Get previous month reading
-        double previousReading = readingService.getPreviousMonthReading(reading.getMeterId(), currentDate);
-        reading.setPreviousMonthReading(previousReading);
-        
-        // Set current date if not already set
-        if (reading.getDate() == null) {
-            reading.setDate(LocalDate.now());
+        if (inputReading.getCurrentMonthReading() == null) {
+            throw new IllegalArgumentException("Current month reading cannot be null");
+        }
+        if (inputReading.getMeterId() == null) {
+            throw new IllegalArgumentException("Meter ID cannot be null");
         }
         
-        // Calculate units consumed
-        reading.calculateUnitConsumed();
+        logger.info("Processing bill reading for meter ID: {}", inputReading.getMeterId());
         
-        // Calculate bill amount
-        reading.calculateBillAmount(billConfiguration.getRatePerUnit());
+        // Get previous month reading
+        double previousReading = readingService.getPreviousMonthReading(inputReading.getMeterId(), currentDate);
+        
+        // Use the date from input or current date as fallback
+        LocalDate readingDate = inputReading.getDate() != null ? inputReading.getDate() : currentDate;
+        
+        // Calculate units consumed using service method
+        double unitsConsumed = calculateUnitsConsumed(inputReading.getCurrentMonthReading(), previousReading);
+        
+        // Calculate bill amount using service method
+        double billAmount = calculateBillAmount(unitsConsumed, billConfiguration.getRatePerUnit());
+        
+        // Create a new BillReading object with all calculated values
+        BillReading processedReading = new BillReading(
+            inputReading.getMeterId(),
+            inputReading.getCurrentMonthReading(),
+            previousReading,
+            readingDate,
+            unitsConsumed,
+            billAmount
+        );
         
         logger.info("Processed reading - Units consumed: {}, Bill amount: {}", 
-                   reading.getUnitConsumed(), reading.getBillAmount());
+                   unitsConsumed, billAmount);
         
-        return reading;
+        return processedReading;
     }
 
     /**
