@@ -30,6 +30,10 @@ public class BillUser {
     
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private UserRole role = UserRole.ROLE_USER; // Default role is USER
 
     // Default constructor
     public BillUser() {
@@ -41,6 +45,16 @@ public class BillUser {
         this.address = address;
         this.email = email;
         this.password = password;
+        this.role = UserRole.ROLE_USER; // Default role
+    }
+    
+    // Constructor with all fields including role
+    public BillUser(String name, String address, String email, String password, UserRole role) {
+        this.name = name;
+        this.address = address;
+        this.email = email;
+        this.password = password;
+        this.role = role;
     }
 
     // Getters and Setters
@@ -82,6 +96,14 @@ public class BillUser {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+    
+    public UserRole getRole() {
+        return role;
+    }
+    
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 
     @Override

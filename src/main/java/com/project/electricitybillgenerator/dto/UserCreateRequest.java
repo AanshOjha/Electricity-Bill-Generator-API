@@ -5,12 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
- * Data Transfer Object for User Registration requests.
+ * Data Transfer Object for User Creation Request.
+ * Used for both regular user registration and admin user creation.
  * 
  * @author Electricity Bill Generator Team
  * @version 1.0
  */
-public class UserRegistrationRequest {
+public class UserCreateRequest {
     
     @NotBlank(message = "Name is required")
     @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
@@ -30,11 +31,11 @@ public class UserRegistrationRequest {
     private String password;
 
     // Default constructor
-    public UserRegistrationRequest() {
+    public UserCreateRequest() {
     }
 
     // Constructor with parameters
-    public UserRegistrationRequest(String name, String address, String email, String password) {
+    public UserCreateRequest(String name, String address, String email, String password) {
         this.name = name;
         this.address = address;
         this.email = email;
@@ -76,7 +77,7 @@ public class UserRegistrationRequest {
 
     @Override
     public String toString() {
-        return "UserRegistrationRequest{" +
+        return "UserCreateRequest{" +
                 "name='" + name + '\'' +
                 ", address='" + address + '\'' +
                 ", email='" + email + '\'' +

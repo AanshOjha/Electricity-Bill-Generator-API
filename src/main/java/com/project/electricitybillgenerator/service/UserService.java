@@ -3,10 +3,12 @@ package com.project.electricitybillgenerator.service;
 import com.project.electricitybillgenerator.config.BillConfiguration;
 import com.project.electricitybillgenerator.model.BillReading;
 import com.project.electricitybillgenerator.model.BillUser;
+import com.project.electricitybillgenerator.model.UserRole;
 import com.project.electricitybillgenerator.repository.ReadingRepository;
 import com.project.electricitybillgenerator.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final ReadingRepository readingRepository;
     private final BillConfiguration billConfiguration;
+    private final PasswordEncoder passwordEncoder;
     private final SecureRandom secureRandom;
 
     /**
@@ -38,18 +41,22 @@ public class UserService {
      * @param userRepository the repository for user operations
      * @param readingRepository the repository for reading operations
      * @param billConfiguration the configuration for billing constants
+     * @param passwordEncoder the password encoder for security
      */
     public UserService(UserRepository userRepository, 
                       ReadingRepository readingRepository,
-                      BillConfiguration billConfiguration) {
+                      BillConfiguration billConfiguration,
+                      PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.readingRepository = readingRepository;
         this.billConfiguration = billConfiguration;
+        this.passwordEncoder = passwordEncoder;
         this.secureRandom = new SecureRandom();
     }
 
     /**
      * Saves a new user with a randomly generated meter ID.
+     * Encodes the password for security.
      * 
      * @param user the user to save
      * @return the saved user with assigned meter ID
@@ -63,11 +70,49 @@ public class UserService {
             throw new RuntimeException("User with email " + user.getEmail() + " already exists");
         }
         
+        // Encode password for security
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        
+        // Set default role if not specified
+        if (user.getRole() == null) {
+            user.setRole(UserRole.ROLE_USER);
+        }
+        
         int meterId = generateUniqueMeterId();
         user.setMeterId(meterId);
         
         BillUser savedUser = userRepository.save(user);
-        logger.info("Successfully saved user with meter ID: {}", meterId);
+        logger.info("Successfully saved user with meter ID: {} and role: {}", meterId, user.getRole());
+        
+        return savedUser;
+    }
+    
+    /**
+     * Creates an admin user for administrative tasks.
+     * 
+     * @param user the user to save as admin
+     * @return the saved admin user
+     * @throws IllegalArgumentException if user data is invalid
+     * @throws RuntimeException if email already exists
+     */
+    public BillUser createAdminUser(BillUser user) {
+        validateUser(user);
+        
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("User with email " + user.getEmail() + " already exists");
+        }
+        
+        // Encode password for security
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        
+        // Set admin role
+        user.setRole(UserRole.ROLE_ADMIN);
+        
+        int meterId = generateUniqueMeterId();
+        user.setMeterId(meterId);
+        
+        BillUser savedUser = userRepository.save(user);
+        logger.info("Successfully created admin user with meter ID: {}", meterId);
         
         return savedUser;
     }

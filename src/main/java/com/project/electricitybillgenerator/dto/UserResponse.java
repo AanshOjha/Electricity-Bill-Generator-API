@@ -5,12 +5,15 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
- * Data Transfer Object for User Registration requests.
+ * Data Transfer Object for User Response.
+ * Used to return user information without exposing sensitive data.
  * 
  * @author Electricity Bill Generator Team
  * @version 1.0
  */
-public class UserRegistrationRequest {
+public class UserResponse {
+    
+    private Integer meterId;
     
     @NotBlank(message = "Name is required")
     @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
@@ -25,23 +28,30 @@ public class UserRegistrationRequest {
     @Size(max = 100, message = "Email must not exceed 100 characters")
     private String email;
     
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
-    private String password;
+    private String role;
 
     // Default constructor
-    public UserRegistrationRequest() {
+    public UserResponse() {
     }
 
     // Constructor with parameters
-    public UserRegistrationRequest(String name, String address, String email, String password) {
+    public UserResponse(Integer meterId, String name, String address, String email, String role) {
+        this.meterId = meterId;
         this.name = name;
         this.address = address;
         this.email = email;
-        this.password = password;
+        this.role = role;
     }
 
     // Getters and Setters
+    public Integer getMeterId() {
+        return meterId;
+    }
+
+    public void setMeterId(Integer meterId) {
+        this.meterId = meterId;
+    }
+
     public String getName() {
         return name;
     }
@@ -66,21 +76,22 @@ public class UserRegistrationRequest {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getRole() {
+        return role;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Override
     public String toString() {
-        return "UserRegistrationRequest{" +
-                "name='" + name + '\'' +
+        return "UserResponse{" +
+                "meterId=" + meterId +
+                ", name='" + name + '\'' +
                 ", address='" + address + '\'' +
                 ", email='" + email + '\'' +
-                ", password='[PROTECTED]'" +
+                ", role='" + role + '\'' +
                 '}';
     }
 }
