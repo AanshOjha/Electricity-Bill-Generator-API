@@ -1,0 +1,871 @@
+{
+	"info": {
+		"_postman_id": "electricity-bill-generator-api",
+		"name": "Electricity Bill Generator API",
+		"description": "Complete collection for testing the Electricity Bill Generator API. Includes authentication, customer management, billing, meter readings, admin functions, and data seeding tools.\n\n## Setup Instructions:\n1. Start MySQL server and create database `elec_bill`\n2. Start the Spring Boot application: `./mvnw spring-boot:run`\n3. Import this collection into Postman\n4. Set the environment variables:\n   - `baseUrl`: http://localhost:8080/api\n   - `userToken`: (will be set automatically after login)\n   - `adminToken`: (will be set automatically after admin login)\n   - `customerId`: (will be set automatically after registration)\n\n## Quick Start with Data Seeding:\n1. Register an admin user\n2. Login as admin to get admin token\n3. Use 'Debug > Seed Test Data' to create sample customers with historical data\n4. Test all endpoints with pre-populated data\n\n## Test Credentials (after seeding):\n- Customer: user.a@example.com / password123\n- Customer: user.b@example.com / password123\n- Customer: user.c@example.com / password123\n\n## Test Flow:\n1. Register a new customer or admin\n2. Login to get appropriate token\n3. Use data seeding endpoints for quick testing\n4. Test all endpoints with sample data",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🔓 Authentication",
+			"item": [
+				{
+					"name": "Register Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    const responseJson = pm.response.json();",
+									"    pm.environment.set('customerId', responseJson.id);",
+									"    pm.test('Customer registered successfully', function () {",
+									"        pm.expect(responseJson).to.have.property('id');",
+									"        pm.expect(responseJson).to.have.property('email');",
+									"        pm.expect(responseJson.role).to.eql('ROLE_USER');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"address\": \"123 Main Street, City\",\n  \"phone\": \"1234567890\",\n  \"customerType\": \"RESIDENTIAL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const responseJson = pm.response.json();",
+									"    pm.environment.set('userToken', responseJson.token);",
+									"    pm.environment.set('customerId', responseJson.customer.id);",
+									"    pm.test('Login successful', function () {",
+									"        pm.expect(responseJson).to.have.property('token');",
+									"        pm.expect(responseJson).to.have.property('customer');",
+									"        pm.expect(responseJson.customer.role).to.eql('ROLE_USER');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const responseJson = pm.response.json();",
+									"    pm.environment.set('adminToken', responseJson.token);",
+									"    pm.test('Admin login successful', function () {",
+									"        pm.expect(responseJson).to.have.property('token');",
+									"        pm.expect(responseJson).to.have.property('customer');",
+									"        pm.expect(responseJson.customer.role).to.eql('ROLE_ADMIN');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@electricitybill.com\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for user registration and login"
+		},
+		{
+			"name": "👤 Customer Profile",
+			"item": [
+				{
+					"name": "Get Own Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/customers/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customers",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Own Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Updated\",\n  \"address\": \"456 New Street\",\n  \"phone\": \"9876543210\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customers/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customers",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Customer profile management endpoints"
+		},
+		{
+			"name": "💡 Meter Readings",
+			"item": [
+				{
+					"name": "Submit Meter Reading",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentReading\": 1350.75,\n  \"readingDate\": \"2024-09-15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/meter-readings/submit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"meter-readings",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Meter Readings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/meter-readings/my-readings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"meter-readings",
+								"my-readings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[ADMIN] Get Pending Bills",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/meter-readings/pending-bills",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"meter-readings",
+								"pending-bills"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Meter reading submission and management"
+		},
+		{
+			"name": "📄 Bills",
+			"item": [
+				{
+					"name": "Get My Bills",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bills/my-bills",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bills",
+								"my-bills"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Bill by Number",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bills/number/BILL-2024-001",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bills",
+								"number",
+								"BILL-2024-001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[ADMIN] Generate Bill",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"meterId\": 1,\n  \"currentReading\": 1450.25,\n  \"readingDate\": \"2024-09-30\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/bills/generate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bills",
+								"generate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[ADMIN] Get Customer Bills",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bills/customer/{{customerId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bills",
+								"customer",
+								"{{customerId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[ADMIN] Get Overdue Bills",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/bills/overdue",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"bills",
+								"overdue"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Bill management and generation"
+		},
+		{
+			"name": "🔐 Admin - Customer Management",
+			"item": [
+				{
+					"name": "Get All Customers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/customers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Customer by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/customers/{{customerId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customers",
+								"{{customerId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Customer",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/customers/{{customerId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customers",
+								"{{customerId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Admin endpoints for customer management"
+		},
+		{
+			"name": "🔐 Admin - User Management",
+			"item": [
+				{
+					"name": "Activate Customer Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/users/{{customerId}}/activate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								"{{customerId}}",
+								"activate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deactivate Customer Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/users/{{customerId}}/deactivate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								"{{customerId}}",
+								"deactivate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Customer Account",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/users/{{customerId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"users",
+								"{{customerId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Admin endpoints for user account management (activate, deactivate, delete)"
+		},
+		{
+			"name": "🔐 Admin - Tariff Management",
+			"item": [
+				{
+					"name": "Create Tariff",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Residential Rate 2024\",\n  \"customerType\": \"RESIDENTIAL\",\n  \"ratePerUnit\": 8.50,\n  \"fixedCharge\": 60.00,\n  \"minimumCharge\": 120.00,\n  \"effectiveDate\": \"2024-01-01\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/tariffs",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"tariffs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Tariffs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/tariffs",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"tariffs"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Admin endpoints for tariff management"
+		},
+		{
+			"name": "🤖 Admin - Billing Control",
+			"item": [
+				{
+					"name": "Trigger Manual Bill Generation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/billing/generate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"billing",
+								"generate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Billing Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/billing/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"billing",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Billing Stats for Month",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/billing/stats/2024-01",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"billing",
+								"stats",
+								"2024-01"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Admin endpoints for automated billing system control and monitoring"
+		},
+		{
+			"name": "🌱 Debug - Data Seeding",
+			"item": [
+				{
+					"name": "Seed Test Data",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/debug/seed-data",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"debug",
+								"seed-data"
+							]
+						},
+						"description": "Creates 3 sample customers (user.a@example.com, user.b@example.com, user.c@example.com) with 8 months of historical meter readings. Password for all: password123"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Test Customers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/debug/test-customers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"debug",
+								"test-customers"
+							]
+						},
+						"description": "Lists all test customers (with @example.com emails) and their meters/readings count"
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Test Data",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/debug/clear-test-data",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"debug",
+								"clear-test-data"
+							]
+						},
+						"description": "Removes all test customers and their associated data (customers with @example.com emails)"
+					},
+					"response": []
+				},
+				{
+					"name": "Seed Readings for Customer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/admin/debug/seed-readings/{{customerId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"debug",
+								"seed-readings",
+								"{{customerId}}"
+							]
+						},
+						"description": "Generates historical readings for a specific customer"
+					},
+					"response": []
+				}
+			],
+			"description": "Development tools for quickly seeding test data and managing test customers"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api",
+			"type": "string"
+		},
+		{
+			"key": "userToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "customerId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

@@ -1,63 +1,59 @@
 package com.project.electricitybillgenerator.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import com.project.electricitybillgenerator.repository.UserRepository;
+import com.project.electricitybillgenerator.dto.request.MeterReadingRequest;
+import com.project.electricitybillgenerator.dto.response.BillResponse;
+import com.project.electricitybillgenerator.entity.Customer;
+import com.project.electricitybillgenerator.service.BillService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import com.project.electricitybillgenerator.model.BillReading;
-import com.project.electricitybillgenerator.model.BillUser;
-import com.project.electricitybillgenerator.service.ReadingService;
-import com.project.electricitybillgenerator.service.UserService;
+import java.util.List;
 
 @RestController
-@RequestMapping("/bill")
+@RequestMapping("/api/bills")
+@CrossOrigin(origins = "*")
 public class BillController {
+
     @Autowired
-    UserService userService;
-    @Autowired
-    ReadingService readingService;
-    @Autowired
-    private UserRepository userRepository;
+    private BillService billService;
 
-    // User registration and operations
-    @PostMapping("/register")
-    public BillUser register(@RequestBody BillUser user) {
-        return userService.saveUser(user);
+    @PostMapping("/generate")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<BillResponse> generateBill(@Valid @RequestBody MeterReadingRequest request) {
+        BillResponse response = billService.createBillFromReading(request);
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/getallusers")
-    public List<BillUser> getAllUsers() {
-        return userService.getAllUsers();
+    @GetMapping("/my-bills")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<List<BillResponse>> getMyBills(Authentication authentication) {
+        Customer customer = (Customer) authentication.getPrincipal();
+        List<BillResponse> bills = billService.getCustomerBills(customer.getId());
+        return ResponseEntity.ok(bills);
     }
 
-    @PostMapping("/deleteuser")
-    public void deleteUser(@RequestParam int meter_id) {
-        userService.deleteUser(meter_id);
+    @GetMapping("/customer/{customerId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<BillResponse>> getCustomerBills(@PathVariable Long customerId) {
+        List<BillResponse> bills = billService.getCustomerBills(customerId);
+        return ResponseEntity.ok(bills);
     }
 
-    @DeleteMapping("/deleteall")
-    public ResponseEntity<String> deleteAllUsers() {
-        userService.deleteAllUsers();
-        return ResponseEntity.ok("Deleted all users!");
+    @GetMapping("/number/{billNumber}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<BillResponse> getBillByNumber(@PathVariable String billNumber) {
+        BillResponse bill = billService.getBillByNumber(billNumber);
+        return ResponseEntity.ok(bill);
     }
 
-    @PostMapping("/insertreading")
-    public BillReading insertReading(@RequestBody BillReading reading) {
-        Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        // Get meter_id & currentMonthReading from user
-        reading.setPreviousMonthReading(readingService.previousMonthReading(reading.getMeter_id(), date));
-        reading.setDate(sdf.format(date).toString());
-
-        // Calculate units consumed and bill
-        reading.setUnitConsumed(reading.getCurrentMonthReading() - reading.getPreviousMonthReading());
-        reading.setBillAmount(reading.getUnitConsumed()*7.5);
-        return userService.insertReading(reading);
+    @GetMapping("/overdue")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<BillResponse>> getOverdueBills() {
+        List<BillResponse> bills = billService.getOverdueBills();
+        return ResponseEntity.ok(bills);
     }
 }
