@@ -1,7 +1,7 @@
 # Electricity Bill Generator
 This is a Spring Boot Rest API which uses MySQL.
 
-## [Demo Video](https://1drv.ms/v/s!Agwf35R6wYp7gbJRGvHbgTXyHPILPA?e=7UeiqX)
+## [Demo Video](https://drive.google.com/file/d/1xRhYs5HtSo5HyXOUnHFl1Lt1EMBW2awN/view?usp=drive_link)
 
 ## Features:
 * Registers user and give them a unique meter ID.
